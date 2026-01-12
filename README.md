@@ -98,7 +98,7 @@ Create a `.env` file in the backend directory:
 
 ```env
 # Database Configuration
-DATABASE_URL=postgresql://postgres:3QBhCBbQnsMB596g@db.gvrayrpuascufmfclesy.supabase.co:5432/postgres
+DATABASE_URL=postgresql://postgres:password@db.gvrayrpuascufmfclesy.supabase.co:5432/postgres
 
 ```
 
