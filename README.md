@@ -100,12 +100,6 @@ Create a `.env` file in the backend directory:
 # Database Configuration
 DATABASE_URL=postgresql://postgres:3QBhCBbQnsMB596g@db.gvrayrpuascufmfclesy.supabase.co:5432/postgres
 
-# API Configuration
-API_HOST=0.0.0.0
-API_PORT=8000
-
-# Frontend URL
-FRONTEND_URL=http://localhost:4200
 ```
 
 
