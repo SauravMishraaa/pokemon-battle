@@ -221,7 +221,7 @@ Round 2:
 SQL scripts are located in `/db`
 
 - `schema_team.sql`  
-  Creates team and team_pokemon tables (Requirement 4)
+  Creates team and team_pokemon tables
 
 - `functions_team.sql`  
   PostgreSQL functions for inserting teams and listing teams by power (Requirement 5)
