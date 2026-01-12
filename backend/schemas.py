@@ -5,7 +5,7 @@ from typing import Optional, List
 class PokemonUpdate(BaseModel):
     power: int
     life: int
-    type: UUID
+    type: str
 
 class TeamCreate(BaseModel):
     name: str
@@ -18,6 +18,17 @@ class BattleRequest(BaseModel):
 class Team(BaseModel):
     id: UUID
     name: str
+
+    class Config:
+        from_attributes = True
+
+class PokemonResponse(BaseModel):
+    id: UUID
+    name: str
+    power: int
+    life: int
+    type: str
+    image: str | None
 
     class Config:
         from_attributes = True

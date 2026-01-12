@@ -1,3 +1,5 @@
+from http.client import HTTPException
+from uuid import UUID
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from db import SessionLocal, engine, Base
@@ -23,18 +25,47 @@ def get_db():
     finally:
         db.close()
 
-@app.get("/pokemons")
+@app.get("/pokemons", response_model=list[schemas.PokemonResponse])
 def list_pokemons(db: Session = Depends(get_db)):
-    return db.query(models.Pokemon).all()
+    pokemons = db.query(models.Pokemon).join(models.PokemonType).all()
+
+    return [
+        schemas.PokemonResponse(
+            id=p.id,
+            name=p.name,
+            power=p.power,
+            life=p.life,
+            type=p.type_rel.name,
+            image=p.image
+        )
+        for p in pokemons
+    ]
+
 
 @app.put("/pokemons/{pokemon_id}")
-def update_pokemon(pokemon_id, data: schemas.PokemonUpdate, db: Session = Depends(get_db)):
+def update_pokemon(
+    pokemon_id: UUID,
+    data: schemas.PokemonUpdate,
+    db: Session = Depends(get_db)
+):
     p = db.query(models.Pokemon).get(pokemon_id)
+    if not p:
+        raise HTTPException(status_code=404, detail="Pokemon not found")
+
+    t = db.query(models.PokemonType).filter(
+        models.PokemonType.name == data.type
+    ).first()
+    if not t:
+        raise HTTPException(status_code=400, detail="Invalid type")
+
     p.power = data.power
     p.life = data.life
-    p.type = data.type
+    p.type = t.id
+
     db.commit()
+    db.refresh(p)
     return p
+
 
 @app.post("/team")
 def create_team(data: schemas.TeamCreate, db: Session = Depends(get_db)):
@@ -55,18 +86,6 @@ def create_team(data: schemas.TeamCreate, db: Session = Depends(get_db)):
         ))
     db.commit()
     return schemas.Team.from_orm(team)
-
-# @app.get("/teams")
-# def list_teams(db: Session = Depends(get_db)):
-#     results = db.execute(text("""
-#         select t.id, sum(p.power) as power
-#         from team t
-#         join team_pokemon tp on tp.team_id = t.id
-#         join pokemon p on p.id = tp.pokemon_id
-#         group by t.id
-#         order by power desc
-#     """)).fetchall()
-#     return [{"id": row[0], "power": row[1]} for row in results]
 
 @app.get("/teams")
 def list_teams(db: Session = Depends(get_db)):
